@@ -2,406 +2,298 @@
 # João Lucas Magalhães de Almeida, 581608
 # Sarah Ingrid Fernandes Alves, 554703
 
+import sys
 
-def ler_arquivo_pistas(nome_arquivo):
-    grade = []
-    pistas = []
-    i = 0
-    while i < 9:
-        linha = []
-        pista = []
-        j = 0
-        while j < 9:
-            linha.append(0)
-            pista.append(False)
-            j = j + 1
-        grade.append(linha)
-        pistas.append(pista)
-        i = i + 1
+#/////////modo interativo e suas funções////////////
+#/////////modo interativo e suas funções////////////
 
-    letras = "ABCDEFGHI"
-    colunas_dict = {}
-    i = 0
-    while i < 9:
-        colunas_dict[letras[i]] = i
-        i = i + 1
+def LerArqPistas(NomeArquivo):
+    Grade = [[0 for _ in range(9)] for _ in range(9)]
+    Pistas = [[False for _ in range(9)] for _ in range(9)]
 
-    arquivo = open(nome_arquivo, "r")
-    linhas = arquivo.readlines()
-    arquivo.close()
+    Letras = "ABCDEFGHI"
+    ColunasDict = {}
+    I = 0
+    while I < 9:
+        ColunasDict[Letras[I]] = I
+        I = I + 1
 
-    total_pistas = 0
-    indice = 0
+    Arquivo = open(NomeArquivo, "r")
+    Linhas = Arquivo.readlines()
+    Arquivo.close()
 
-    while indice < len(linhas):
-        linha_original = linhas[indice]
-        indice = indice + 1
+    TotalPistas = 0
+    Indice = 0
+    while Indice < len(Linhas):
+        LinhaOriginal = Linhas[Indice]
+        LinhaLimpa = LinhaOriginal.strip()
+        Indice = Indice + 1
 
-        linha_limpa = linha_original.strip()
-        tamanho = len(linha_limpa)
-        if tamanho > 0:
-            partes = linha_limpa.split(":")
-            if len(partes) == 2:
-                lado = partes[0].strip()
-                numero_str = partes[1].strip()
-
-                if numero_str.isdigit():
-                    numero = int(numero_str)
-
-                    if numero >= 1 and numero <= 9:
-                        lado_partes = lado.split(",")
-
-                        if len(lado_partes) == 2:
-                            col_letra = lado_partes[0].strip().upper()
-                            lin_str = lado_partes[1].strip()
-
-                            if lin_str.isdigit():
-                                linha = int(lin_str) - 1
-
-                                if col_letra in colunas_dict:
-                                    coluna = colunas_dict[col_letra]
-
-                                    if linha >= 0 and linha < 9:
-                                        valor_existente = grade[linha][coluna]
-
-                                        if valor_existente == 0:
-                                            grade[linha][coluna] = numero
-                                            pistas[linha][coluna] = True
-                                            total_pistas = total_pistas + 1
-                                        elif valor_existente != numero:
-                                            print("Pista conflitante na célula (" + col_letra + "," + str(linha + 1) + ")")
-                                            return "ERRO"
-                                    else:
-                                        print("Linha fora do intervalo (1-9): " + str(linha + 1))
-                                        return "ERRO"
-                                else:
-                                    print("Coluna inválida: " + col_letra)
-                                    return "ERRO"
-                            else:
-                                print("Linha inválida: " + lin_str)
-                                return "ERRO"
-                        else:
-                            print("Formato inválido: " + linha_limpa)
-                            return "ERRO"
-                    else:
-                        print("Número fora do intervalo (1-9): " + numero_str)
-                        return "ERRO"
-                else:
-                    print("Número inválido: " + numero_str)
-                    return "ERRO"
-            else:
-                print("Formato inválido: " + linha_limpa)
+        if len(LinhaLimpa) > 0:
+            Partes = LinhaLimpa.split(":")
+            if len(Partes) != 2:
+                print("Formato inválido: " + LinhaLimpa)
                 return "ERRO"
 
-    if total_pistas < 1 or total_pistas > 80:
-        print("Número de pistas inválido: " + str(total_pistas))
+            Lado = Partes[0].strip()
+            NumeroStr = Partes[1].strip()
+
+            if NumeroStr.isdigit() == False:
+                print("Número inválido: " + NumeroStr)
+                return "ERRO"
+
+            Numero = int(NumeroStr)
+            if Numero < 1 or Numero > 9:
+                print("O número: " + NumeroStr + "deveria ser de 1 a 9.")
+                return "ERRO"
+
+            LadoPartes = Lado.split(",")
+            if len(LadoPartes) != 2:
+                print("Formato inválido: " + LinhaLimpa)
+                return "ERRO"
+
+            ColLetra = LadoPartes[0].strip().upper()
+            LinStr = LadoPartes[1].strip()
+
+            if LinStr.isdigit() == False:
+                print("Linha inválida: " + LinStr)
+                return "ERRO"
+
+            Linha = int(LinStr) - 1
+            if ColLetra in ColunasDict:
+                Coluna = ColunasDict[ColLetra]
+            else:
+                print("Coluna inválida: " + ColLetra)
+                return "ERRO"
+
+            if Linha < 0 or Linha >= 9:
+                print("A linha: " + str(Linha + 1) + "deveria ser de 1 a 9.")
+                return "ERRO"
+
+            ValorExistente = Grade[Linha][Coluna]
+            if ValorExistente == 0:
+                Grade[Linha][Coluna] = Numero
+                Pistas[Linha][Coluna] = True
+                TotalPistas = TotalPistas + 1
+            elif ValorExistente != Numero:
+                print("Pista conflitante na célula (" + ColLetra + "," + str(Linha + 1) + ")")
+                return "ERRO"
+
+    if TotalPistas < 1 or TotalPistas > 80:
+        print("Número de pistas inválido: " + str(TotalPistas) + "(Deve ser de 1 a 80 no máximo).")
         return "ERRO"
 
-    i = 0
-    while i < 9:
-        j = 0
-        while j < 9:
-            valor = grade[i][j]
-            if valor != 0:
-                grade[i][j] = 0
-                resultado = valida_jogada(grade, pistas, i, j, valor)
-                if resultado == False:
-                    print("Pista inválida na posição (" + str(i+1) + "," + str(j+1) + ") fere as regras do Sudoku.")
+    I = 0
+    while I < 9:
+        J = 0
+        while J < 9:
+            Valor = Grade[I][J]
+            if Valor != 0:
+                Grade[I][J] = 0
+                Resultado = ValidaJogada(Grade, I, J, Valor)
+                if Resultado == False:
+                    print("Pista inválida na posição (" + str(I+1) + "," + str(J+1) + ") fere as regras básicas do Sudoku.")
                     return "ERRO"
-                grade[i][j] = valor
-            j = j + 1
-        i = i + 1
+                Grade[I][J] = Valor
+            J = J + 1
+        I = I + 1
 
-    return [grade, pistas]
+    return [Grade, Pistas]
 
-#/////////////////////divisçao de funçoes aqui///////////////////////////
-#/////////////////////divisçao de funçoes aqui///////////////////////////
+#///////////divisão de função aqui/////////////
+#///////////divisão de função aqui/////////////
 
-def mostrar_grade(grade, pistas):
-    RED = '\033[91m'
-    RESET = '\033[0m'
+def MostrarGrade(Grade, Pistas):
+    Red = '\033[91m'
+    Reset = '\033[0m'
 
-    def linha_horizontal(tipo):
-        if tipo == 'fina':
-            return " ++---+---+---++---+---+---++---+---+---++"
-        elif tipo == 'grossa':
+    def LinhaHorizontal(Tipo):
+        if Tipo == 'grossa':
             return " ++===+===+===++===+===+===++===+===+===++"
+        return " ++---+---+---++---+---+---++---+---+---++"
 
     print("    A   B   C    D   E   F    G   H   I")
 
-    for lin in range(9):
-        if lin % 3 == 0:
-            print(linha_horizontal('grossa'))
+    Lin = 0
+    while Lin < 9:
+        if Lin % 3 == 0:
+            print(LinhaHorizontal('grossa'))
         else:
-            print(linha_horizontal('fina'))
+            print(LinhaHorizontal('fina'))
 
-        linha = f"{lin+1}||"
-        for col in range(9):
-            val = grade[lin][col]
-            sep = "|" if (col + 1) % 3 != 0 else "||"
-
-            if val == 0:
-                linha += "   " + sep
+        LinhaStr = str(Lin + 1) + "||"
+        Col = 0
+        while Col < 9:
+            Valor = Grade[Lin][Col]
+            if (Col + 1) % 3 != 0:
+                Sep = "|"
             else:
-                if pistas[lin][col]:
-                    linha += RED + f" {val} " + RESET + sep
+                Sep = "||"
+            if Valor == 0:
+                LinhaStr = LinhaStr + "   " + Sep
+            else:
+                if Pistas[Lin][Col] == True:
+                    LinhaStr = LinhaStr + Red + " " + str(Valor) + " " + Reset + Sep
                 else:
-                    linha += f" {val} " + sep
+                    LinhaStr = LinhaStr + " " + str(Valor) + " " + Sep
+            Col = Col + 1
+        print(LinhaStr + str(Lin + 1))
+        Lin = Lin + 1
 
-        print(linha + f"{lin+1}")
-
-    print(linha_horizontal('grossa'))
+    print(LinhaHorizontal('grossa'))
     print("    A   B   C    D   E   F    G   H   I")
 
+#///////////divisão de função aqui/////////////
+#///////////divisão de função aqui/////////////
 
+def EntradaJogada():
+    Letras = "ABCDEFGHI"
+    ColunasDict = {}
+    I = 0
+    while I < 9:
+        ColunasDict[Letras[I]] = I
+        I = I + 1
 
-#/////////////////////divisçao de funçoes aqui///////////////////////////
-#/////////////////////divisçao de funçoes aqui///////////////////////////
+    Entrada = input("Digite a jogada: ").strip()
+    if len(Entrada) == 0:
+        return ["ERRO", "Você não deu uma entrada ainda"]
 
-def entrada_jogada():
-    letras = "ABCDEFGHI"
-    colunas_dict = {}
-    i = 0
-    while i < 9:
-        colunas_dict[letras[i]] = i
-        i = i + 1
+    Partes = Entrada.split(":")
+    if len(Partes) != 2:
+        return ["ERRO", "Formato inválido para jogada (esperado: C,3: 7)"]
 
-    entrada = input("Digite a jogada:").strip()
+    Lado = Partes[0].strip()
+    NumeroStr = Partes[1].strip()
 
-    tamanho = len(entrada)
-    if tamanho == 0:
-        return ["ERRO", "Entrada vazia"]
+    PartesLado = Lado.split(",")
+    if len(PartesLado) != 2:
+        return ["ERRO", "Formato inválido da posição (esperado: C,3)"]
 
-    primeiro = entrada[0]
-    if primeiro == "?":
-        comando = "CONSULTA"
-        resto = entrada[1:]
-    elif primeiro == "!":
-        comando = "APAGAR"
-        resto = entrada[1:]
-    else:
-        comando = "JOGADA"
-        resto = entrada
+    ColLetra = PartesLado[0].strip().upper()
+    LinStr = PartesLado[1].strip()
 
-    partes = resto.split(":")
-    if comando == "JOGADA":
-        if len(partes) != 2:
-            return ["ERRO", "Formato inválido para jogada"]
-
-        lado = partes[0].strip()
-        numero_str = partes[1].strip()
-
-        partes_lado = lado.split(",")
-        if len(partes_lado) != 2:
-            return ["ERRO", "Formato inválido da posição"]
-
-        col_letra = partes_lado[0].strip().upper()
-        lin_str = partes_lado[1].strip()
-
-        if col_letra in colunas_dict and lin_str.isdigit() and numero_str.isdigit():
-            coluna = colunas_dict[col_letra]
-            linha = int(lin_str) - 1
-            numero = int(numero_str)
-            if linha >= 0 and linha < 9 and numero >= 1 and numero <= 9:
-                return ["JOGADA", linha, coluna, numero]
-            else:
-                return ["ERRO", "Linha ou número fora do intervalo"]
+    if ColLetra in ColunasDict and LinStr.isdigit() and NumeroStr.isdigit():
+        Coluna = ColunasDict[ColLetra]
+        Linha = int(LinStr) - 1
+        Numero = int(NumeroStr)
+        if Linha >= 0 and Linha < 9 and Numero >= 1 and Numero <= 9:
+            return ["JOGADA", Linha, Coluna, Numero]
         else:
-            return ["ERRO", "Coluna inválida ou dados não numéricos"]
-
+            return ["ERRO", "Linha ou número fora do intervalo (1–9)"]
     else:
-        partes_lado = resto.split(",")
-        if len(partes_lado) != 2:
-            return ["ERRO", "Formato inválido da posição"]
+        return ["ERRO", "Coluna inválida ou dados não numéricos"]
 
-        col_letra = partes_lado[0].strip().upper()
-        lin_str = partes_lado[1].strip()
+#///////////divisão de função aqui/////////////
+#///////////divisão de função aqui/////////////
 
-        if col_letra in colunas_dict and lin_str.isdigit():
-            coluna = colunas_dict[col_letra]
-            linha = int(lin_str) - 1
-            if linha >= 0 and linha < 9:
-                if comando == "CONSULTA":
-                    return ["CONSULTA", linha, coluna]
-                elif comando == "APAGAR":
-                    return ["APAGAR", linha, coluna]
-        return ["ERRO", "Coluna ou linha inválida"]
-
-
-#/////////////////////divisçao de funçoes aqui///////////////////////////
-#/////////////////////divisçao de funçoes aqui///////////////////////////
-
-def valida_jogada(grade, pistas, linha, coluna, numero):
-    i = 0
-    while i < 9:
-        if grade[linha][i] == numero:
+def ValidaJogada(Grade, Linha, Coluna, Numero):
+    I = 0
+    while I < 9:
+        if Grade[Linha][I] == Numero:
             return False
-        i = i + 1
-    i = 0
-
-    while i < 9:
-        if grade[i][coluna] == numero:
+        if Grade[I][Coluna] == Numero:
             return False
-        i = i + 1
-    inicio_linha = (linha // 3) * 3
-    inicio_coluna = (coluna // 3) * 3
+        I = I + 1
 
-    i = 0
-    while i < 3:
-        j = 0
-        while j < 3:
-            atual = grade[inicio_linha + i][inicio_coluna + j]
-            if atual == numero:
+    InicioLinha = (Linha // 3) * 3
+    InicioColuna = (Coluna // 3) * 3
+
+    I = 0
+    while I < 3:
+        J = 0
+        while J < 3:
+            if Grade[InicioLinha + I][InicioColuna + J] == Numero:
                 return False
-            j = j + 1
-        i = i + 1
+            J = J + 1
+        I = I + 1
 
     return True
 
+#///////////divisão de função aqui/////////////
+#///////////divisão de função aqui/////////////
 
-#/////////////////////divisçao de funçoes aqui///////////////////////////
-#/////////////////////divisçao de funçoes aqui///////////////////////////
+def ExecutarComandoInterativo(Grade, Pistas):
+    print("Modo Interativo rodando.")
+    JogoAtivo = True
 
-def executar_comando_interativo(grade, pistas):
-    print("Modo Interativo iniciado.")
-    jogo_ativo = True
+    while JogoAtivo == True:
+        MostrarGrade(Grade, Pistas)
+        Entrada = EntradaJogada()
 
-    while jogo_ativo:
-        mostrar_grade(grade, pistas)
-        entrada = entrada_jogada()
+        if Entrada[0] == "ERRO":
+            print("Erro: " + Entrada[1])
+        else:
+            Linha = Entrada[1]
+            Coluna = Entrada[2]
+            Numero = Entrada[3]
 
-        if entrada[0] == "ERRO":
-            print("Erro: " + entrada[1])
-        
-        elif entrada[0] == "JOGADA":
-            linha = entrada[1]
-            coluna = entrada[2]
-            numero = entrada[3]
-
-            if pistas[linha][coluna] == True:
+            if Pistas[Linha][Coluna] == True:
                 print("Essa posição é uma pista e não pode ser modificada.")
-            elif grade[linha][coluna] != 0:
-                print("Essa célula já foi preenchida.")
-                resposta = input("Deseja sobrescrever? (s/n): ").strip().lower()
-                if resposta == "s":
-                    if valida_jogada(grade, pistas, linha, coluna, numero):
-                        grade[linha][coluna] = numero
+            elif Grade[Linha][Coluna] != 0:
+                Resposta = input("Essa célula já foi preenchida. Deseja sobrescrever? (s/n): ").strip().lower()
+                if Resposta == "s":
+                    if ValidaJogada(Grade, Linha, Coluna, Numero):
+                        Grade[Linha][Coluna] = Numero
                     else:
                         print("Jogada inválida: viola as regras do Sudoku.")
                 else:
                     print("Jogada cancelada.")
             else:
-                if valida_jogada(grade, pistas, linha, coluna, numero):
-                    grade[linha][coluna] = numero
+                if ValidaJogada(Grade, Linha, Coluna, Numero):
+                    Grade[Linha][Coluna] = Numero
                 else:
                     print("Jogada inválida: viola as regras do Sudoku.")
 
-        elif entrada[0] == "CONSULTA":
-            linha = entrada[1]
-            coluna = entrada[2]
+            I = 0
+            Completo = True
+            while I < 9:
+                J = 0
+                while J < 9:
+                    if Grade[I][J] == 0:
+                        Completo = False
+                    J = J + 1
+                I = I + 1
 
-            if grade[linha][coluna] != 0:
-                print("Célula já preenchida.")
-            elif pistas[linha][coluna] == True:
-                print("Essa célula é uma pista e não pode ser alterada.")
-            else:
-                print("Possibilidades para a célula:")
-                possibilidades = []
-                numero = 1
-                while numero <= 9:
-                    if valida_jogada(grade, pistas, linha, coluna, numero):
-                        possibilidades.append(str(numero))
-                    numero = numero + 1
-                print(", ".join(possibilidades))
+            if Completo == True:
+                print("Verificando se a solução está correta...")
+                Valido = True
+                I = 0
+                while I < 9:
+                    J = 0
+                    while J < 9:
+                        Valor = Grade[I][J]
+                        Grade[I][J] = 0
+                        if ValidaJogada(Grade, I, J, Valor) == False:
+                            Valido = False
+                        Grade[I][J] = Valor
+                        J = J + 1
+                    I = I + 1
 
-        elif entrada[0] == "APAGAR":
-            linha = entrada[1]
-            coluna = entrada[2]
+                if Valido == True:
+                    MostrarGrade(Grade, Pistas)
+                    print("Parabéns! Você completou o Sudoku corretamente.")
+                    JogoAtivo = False
+                else:
+                    print("A grade está completa, mas contém erros. Continue corrigindo.")
 
-            if pistas[linha][coluna] == True:
-                print("Você não pode apagar uma pista.")
-            elif grade[linha][coluna] == 0:
-                print("A célula já está vazia.")
-            else:
-                grade[linha][coluna] = 0
-                print("Célula apagada.")
-
-        completo = True
-        i = 0
-        while i < 9:
-            j = 0
-            while j < 9:
-                if grade[i][j] == 0:
-                    completo = False
-                j = j + 1
-            i = i + 1
-
-        if completo == True:
-            print("Verificando se a solução está correta...")
-            valido = True
-            i = 0
-            while i < 9:
-                j = 0
-                while j < 9:
-                    valor = grade[i][j]
-                    grade[i][j] = 0
-                    if valida_jogada(grade, pistas, i, j, valor) == False:
-                        valido = False
-                    grade[i][j] = valor
-                    j = j + 1
-                i = i + 1
-            if valido == True:
-                mostrar_grade(grade, pistas)
-                print("Parabéns! Você completou o Sudoku corretamente.")
-                jogo_ativo = False
-            else:
-                print("A grade está completa, mas contém erros. Continue corrigindo.")
-
-
-#//////////////////////Usando as funções acima/////////////////////////////////////
-#//////////////////////Usando as funções acima/////////////////////////////////////
+#////////usando os subprogramas////////////
+#////////usando os subprogramas////////////
 
 if __name__ == "__main__":
-    nome_arquivo = "arq_01_cfg.txt"
-    resultado = ler_arquivo_pistas(nome_arquivo)
-
-    if resultado == "ERRO":
-        print("Erro ao processar o arquivo de pistas.")
+    if len(sys.argv) != 2:
+        print("Uso: python3 jogoSudoku.py nome_arquivo.txt")
     else:
-        grade, pistas = resultado
+        NomeArquivo = sys.argv[1]
+        Resultado = LerArqPistas(NomeArquivo)
 
-        while True:
-            mostrar_grade(grade, pistas)
-            comando = entrada_jogada()
-
-            if comando[0] == "ERRO":
-                print("Erro na entrada:", comando[1])
-
-            elif comando[0] == "JOGADA":
-                linha, coluna, numero = comando[1], comando[2], comando[3]
-                if pistas[linha][coluna]:
-                    print("Não pode alterar uma pista fixa.")
-                elif valida_jogada(grade, pistas, linha, coluna, numero):
-                    grade[linha][coluna] = numero
-                else:
-                    print("Jogada inválida pelas regras do Sudoku.")
-
-            elif comando[0] == "APAGAR":
-                linha, coluna = comando[1], comando[2]
-                if pistas[linha][coluna]:
-                    print("Não pode apagar uma pista fixa.")
-                else:
-                    grade[linha][coluna] = 0
-
-            elif comando[0] == "CONSULTA":
-                linha, coluna = comando[1], comando[2]
-                valor = grade[linha][coluna]
-                if valor == 0:
-                    print(f"Célula {chr(ord('A')+coluna)},{linha+1} está vazia.")
-                else:
-                    print(f"Célula {chr(ord('A')+coluna)},{linha+1} contém: {valor}")
-
+        if Resultado == "ERRO":
+            print("Erro ao processar o arquivo de pistas.")
+        else:
+            Grade = Resultado[0]
+            Pistas = Resultado[1]
+            Modo = input("Qual modo deseja jogar?(interativo/solucionador): ").strip().upper()
+            if Modo == "INTERATIVO":
+                ExecutarComandoInterativo(Grade, Pistas)
             else:
-                print("Comando não listado.")
-
-
+                if Modo == "SOLUCIONADOR":
+                    print("Modo SOLUCIONADOR ainda não implementado.")
